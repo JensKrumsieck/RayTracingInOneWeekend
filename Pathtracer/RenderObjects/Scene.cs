@@ -36,7 +36,7 @@ public class Scene
     public static Scene Earth()
     {
         var scene = new Scene();
-        var image = new ImageTexture(@"D:\Downloads\earthmap.jpg");
+        var image = new ImageTexture(@".\assets\textures\earthmap.jpg");
         scene.Materials.Add(new Lambertian(image));
         scene.Objects.Add(new Sphere{Radius = 2});
         return scene;

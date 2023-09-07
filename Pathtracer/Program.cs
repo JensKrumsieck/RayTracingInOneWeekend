@@ -6,7 +6,7 @@ using Silk.NET.Input.Glfw;
 using Silk.NET.Windowing;
 using Silk.NET.Windowing.Glfw;
 
-GlfwWindowing.RegisterPlatform();;
+GlfwWindowing.RegisterPlatform();
 GlfwInput.RegisterPlatform();
 GlfwWindowing.Use();
 
@@ -23,5 +23,4 @@ app.UseVulkan(options)
     .UseImGui()
     .AttachLayer<AppLayer>();
 app.Run();
-
 app.Dispose();

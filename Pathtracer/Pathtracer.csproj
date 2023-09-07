@@ -11,4 +11,9 @@
     <ItemGroup>
       <PackageReference Include="Catalyze" Version="0.1.0-alpha.4" />
     </ItemGroup>
+    <ItemGroup>
+        <None Include="assets/**/*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 </Project>
