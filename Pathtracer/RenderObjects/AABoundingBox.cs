@@ -35,6 +35,15 @@ public sealed class AABoundingBox
         _z = new Interval(b1._z, b2._z);
     }
 
+    public AABoundingBox Pad()
+    {
+        var delta = .0001f;
+        var newX = (_x.Size >= delta) ? _x : _x.Expand(delta);
+        var newY = (_y.Size >= delta) ? _y : _y.Expand(delta);
+        var newZ = (_z.Size >= delta) ? _z : _z.Expand(delta);
+        return new AABoundingBox(newX, newY, newZ);
+    }
+
     public Interval Axis(int n) => n switch
     {
         1 => _y,

@@ -33,6 +33,24 @@ public class Scene
         }
     }
 
+    public static Scene Quads()
+    {
+        var scene = new Scene();
+        scene.Materials.Add(new Lambertian(1f,.2f,.2f));
+        scene.Materials.Add(new Lambertian(.2f,1f,.2f));
+        scene.Materials.Add(new Lambertian(.2f,.2f,1f));
+        scene.Materials.Add(new Lambertian(1f,.5f,.0f));
+        scene.Materials.Add(new Lambertian(.2f,.8f,.8f));
+        
+        scene.Objects.Add(new Quad{Position = new Vector3(-3,-2,5), U = new Vector3(0,0,-4), V = new Vector3(0,4,0), MaterialIndex = 0});
+        scene.Objects.Add(new Quad{Position = new Vector3(-2,-2,0), U = new Vector3(4,0,0), V = new Vector3(0,4,0), MaterialIndex = 1});
+        scene.Objects.Add(new Quad{Position = new Vector3(3,-2,1), U = new Vector3(0,0,4), V = new Vector3(0,4,0), MaterialIndex = 2});
+        scene.Objects.Add(new Quad{Position = new Vector3(-2,3,1), U = new Vector3(4,0,0), V = new Vector3(0,0,4), MaterialIndex = 3});
+        scene.Objects.Add(new Quad{Position = new Vector3(-2,-3,5), U = new Vector3(4,0,0), V = new Vector3(0,0,-4), MaterialIndex = 4});
+        return scene;
+    }
+    
+    
     public static Scene Earth()
     {
         var scene = new Scene();

@@ -14,15 +14,22 @@ public class AppLayer : IAppLayer
     private uint _viewportHeight;
     private bool _stop;
 
-    private readonly Scene _scene = Scene.Earth();
+    private readonly Scene _scene = Scene.Quads();
+
     private Camera _camera = new()
     {
-        VerticalFovDegrees = 20,
-        Position = new Vector3(13,2,3),
-        LookAt = new Vector3(0,0,0),
-        Up = new Vector3(0,1,0),
-        DepthOfFieldSettings = new DepthOfFieldSettings(0.6f, 10.0f)
+        VerticalFovDegrees = 80,
+        Position = new Vector3(0, 0,9),
+        LookAt = Vector3.Zero,
+        DepthOfFieldSettings = new DepthOfFieldSettings(0,100)
     };
+    // {
+    //     VerticalFovDegrees = 20,
+    //     Position = new Vector3(13,2,3),
+    //     LookAt = new Vector3(0,0,0),
+    //     Up = new Vector3(0,1,0),
+    //     DepthOfFieldSettings = new DepthOfFieldSettings(0.6f, 10.0f)
+    // };
 
     private void PushStyle()
     {

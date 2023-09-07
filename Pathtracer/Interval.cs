@@ -4,6 +4,7 @@ public readonly struct Interval
 {
     public readonly float Min;
     public readonly float Max;
+    public float Size => Max - Min;
 
     public Interval(float min, float max)
     {
@@ -28,6 +29,7 @@ public readonly struct Interval
         if (x > Max) return Max;
         return x;
     }
+
     public bool Contains(float x) => Min <= x && x <= Max;
     public bool Surrounds(float x) => Min < x && x < Max;
     public Interval Expand(float delta)
