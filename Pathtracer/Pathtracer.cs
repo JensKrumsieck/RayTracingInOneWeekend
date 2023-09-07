@@ -29,7 +29,7 @@ public sealed unsafe class Pathtracer : IDisposable
     private int _frameIndex = 1;
 
     public void LoadScene(Scene scene) => _activeScene = scene.Compile();
-    
+
     public void OnRender(Camera camera)
     {
         if(_texture is null || _imageData is null || _accumulationData is null) return;

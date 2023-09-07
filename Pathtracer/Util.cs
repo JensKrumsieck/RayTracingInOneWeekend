@@ -21,6 +21,7 @@ public static class Util
         return ia << 24 | ib << 16 | ig << 8 | ir;
     }
     
+    //obsolete with next update of Catalyze
     public static SKBitmap LoadImageFromFile(string filename)
     {
         using var fs = File.Open(filename, FileMode.Open);
