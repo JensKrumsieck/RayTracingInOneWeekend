@@ -9,9 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Catalyze" Version="0.1.0-alpha.3" />
+      <PackageReference Include="Catalyze" Version="0.1.0-alpha.4" />
     </ItemGroup>
-
-
-
 </Project>

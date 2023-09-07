@@ -1,20 +1,66 @@
 ﻿using System.Numerics;
+using Pathtracer.Materials;
+using Pathtracer.Materials.Textures;
 using Random = Catalyze.Random;
 
-namespace Pathtracer;
+namespace Pathtracer.RenderObjects;
 
 public class Scene
 {
-    public readonly List<Shape> Objects = new();
+    public readonly List<Hittable> Objects = new();
     public readonly List<Material> Materials = new();
+    public AABoundingBox BBox = new();
+    
+    public Scene Compile()
+    {
+        CalculateBoundingBox();
+        var scene = new Scene();
+        scene.Objects.Add(new BVHNode(this));
+        scene.Materials.AddRange(Materials);
+        scene.BBox = BBox;
+        return scene;
+    }
+
+    private void CalculateBoundingBox()
+    {
+        foreach (var @object in Objects)
+        {
+            if (@object is Shape s)
+            {
+                s.CalculateBoundingBox();
+                BBox = new AABoundingBox(BBox, s.BoundingBox);
+            }
+        }
+    }
+
+    public static Scene Earth()
+    {
+        var scene = new Scene();
+        var image = new ImageTexture(@"D:\Downloads\earthmap.jpg");
+        scene.Materials.Add(new Lambertian(image));
+        scene.Objects.Add(new Sphere{Radius = 2});
+        return scene;
+    }
+    
+    public static Scene TwoSpheres()
+    {
+        var scene = new Scene();
+        var checker = new CheckerTexture(.8f, new Vector3(.2f, .3f, .1f), new Vector3(.9f, .9f, .9f));
+        scene.Materials.Add(new Lambertian(checker));
+        scene.Objects.Add(new Sphere{Position = new Vector3(0,10,0), Radius = 10});
+        scene.Objects.Add(new Sphere{Position = new Vector3(0,-10,0), Radius = 10});
+        return scene;
+    }
 
     public static Scene Book1Cover()
     {
         var scene = new Scene();
+        //textures
+        var checker = new CheckerTexture(0.32f, new Vector3(.2f, .3f, .1f), new Vector3(.9f, .9f, .9f));
         //main elements
-        scene.Materials.Add(new Lambertian {Albedo = new Vector3(.5f, .5f, .5f)});
+        scene.Materials.Add(new Lambertian(checker));
         scene.Materials.Add(new Dielectric {IoR = 1.5f});
-        scene.Materials.Add(new Lambertian {Albedo = new Vector3(0.4f, 0.2f, 0.1f)});
+        scene.Materials.Add(new Lambertian(0.4f, 0.2f, 0.1f));
         scene.Materials.Add(new Metal {Albedo = new Vector3(0.7f, 0.6f, 0.5f), Roughness = 0.0f});
         scene.Objects.Add(new Sphere {Position = new Vector3(0, -1000, 0), Radius = 1000f, MaterialIndex = 0});
         scene.Objects.Add(new Sphere {Position = new Vector3(0, 1, 0), Radius = 1.0f, MaterialIndex = 1});
@@ -34,7 +80,7 @@ public class Scene
                     if (randomMaterialSelector < .8f)
                     {
                         var albedo = Random.Vec3(ref seed, 0, 1) * Random.Vec3(ref seed, 0, 1);
-                        scene.Materials.Add(new Lambertian {Albedo = albedo});
+                        scene.Materials.Add(new Lambertian(albedo));
                     }
                     else if (randomMaterialSelector < .95f)
                     {

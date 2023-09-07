@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
+using SkiaSharp;
 
 namespace Pathtracer;
 
@@ -20,6 +21,16 @@ public static class Util
         return ia << 24 | ib << 16 | ig << 8 | ir;
     }
     
+    public static SKBitmap LoadImageFromFile(string filename)
+    {
+        using var fs = File.Open(filename, FileMode.Open);
+        using var codec = SKCodec.Create(fs);
+        var imgInfo = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        var image = SKBitmap.Decode(codec, imgInfo);
+        if (image is null) throw new IOException($"Failed to load image from {filename}");
+        return image;
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector4 LinearToGamma(Vector4 linear) => new(
         ComponentToGamma(linear.X),
@@ -38,24 +49,4 @@ public static class Util
                                                        MathF.Abs(v.Y) < float.Epsilon && 
                                                        MathF.Abs(v.Z) < float.Epsilon;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Reflect(Vector3 v, Vector3 n) => v - 2 * Vector3.Dot(v, n) * n;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Refract(Vector3 uv, Vector3 n, float f0)
-    {
-        var cosTheta = MathF.Min(Vector3.Dot(-uv, n), 1.0f);
-        var perpendicular = f0 * (uv + cosTheta * n);
-        var parallel = -MathF.Sqrt(MathF.Abs(1 - perpendicular.LengthSquared())) * n;
-        return perpendicular + parallel;
-    }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float SchlickFresnel(float cosTheta, float ior)
-    {
-        var r0 = (1 - ior) / (1 + ior);
-        r0 = r0 * r0;
-        return r0 + (1 - r0) * MathF.Pow((1 - cosTheta), 5);
-    }
 }

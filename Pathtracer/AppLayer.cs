@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Catalyze.Applications;
 using ImGuiNET;
-using Random = Catalyze.Random;
+using Pathtracer.RenderObjects;
 
 namespace Pathtracer;
 
@@ -14,7 +14,7 @@ public class AppLayer : IAppLayer
     private uint _viewportHeight;
     private bool _stop;
 
-    private readonly Scene _scene = Scene.Book1Cover();
+    private readonly Scene _scene = Scene.Earth();
     private Camera _camera = new()
     {
         VerticalFovDegrees = 20,
@@ -37,6 +37,7 @@ public class AppLayer : IAppLayer
     {
         PushStyle();
         _pathtracer.Settings.TimeLimit = 50;
+        _pathtracer.LoadScene(_scene);
     }
 
     public void OnDrawGui(double deltaTime)
@@ -75,7 +76,7 @@ public class AppLayer : IAppLayer
         
         _camera.OnResize(_viewportWidth, _viewportHeight);
         if(_pathtracer.OnResize(_viewportWidth, _viewportHeight)) _diagnoser.Reset();
-        _pathtracer.OnRender(_scene, _camera);
+        _pathtracer.OnRender(_camera);
         
         _diagnoser.EndFrame();
     }

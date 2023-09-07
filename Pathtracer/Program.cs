@@ -24,5 +24,4 @@ app.UseVulkan(options)
     .AttachLayer<AppLayer>();
 app.Run();
 
-
 app.Dispose();

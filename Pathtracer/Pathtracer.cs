@@ -2,6 +2,7 @@
 using Catalyze;
 using Catalyze.Applications;
 using Catalyze.UI;
+using Pathtracer.RenderObjects;
 using Silk.NET.Vulkan;
 using SkiaSharp;
 using Renderer = Catalyze.Renderer;
@@ -23,14 +24,15 @@ public sealed unsafe class Pathtracer : IDisposable
     public static uint Seed;
     private Vector4[]? _accumulationData;
 
-    private Scene _activeScene = null!;
+    private Scene? _activeScene;
     private Camera _activeCamera = null!;
     private int _frameIndex = 1;
 
-    public void OnRender(Scene scene, Camera camera)
+    public void LoadScene(Scene scene) => _activeScene = scene.Compile();
+    
+    public void OnRender(Camera camera)
     {
         if(_texture is null || _imageData is null || _accumulationData is null) return;
-        _activeScene = scene;
         _activeCamera = camera;
         if(_frameIndex == 1) Array.Clear(_accumulationData);
 
@@ -59,29 +61,32 @@ public sealed unsafe class Pathtracer : IDisposable
     }
     private Vector4 PerPixel(ref Ray ray, int depth)
     {
-        if(depth <= 0) return Vector4.Zero;
+        if (depth <= 0) return Vector4.Zero;
+        if (!_activeScene!.BBox.Hit(ref ray, new Interval(0.001f, float.MaxValue))) return RayMiss(ref ray);
+        
         var closestT = float.MaxValue;
-        var hitObject = HitPayload.NoHit;
-        for (var i = 0; i < _activeScene.Objects.Count; i++)
+        var hit = false;
+        var hitPayload = HitPayload.NoHit;
+        for (var i = 0; i < _activeScene!.Objects.Count; i++)
         {
-            var payload = _activeScene.Objects[i].Hit(ref ray, new Interval(0.001f, closestT));
-            if (payload.HitDistance > -1 && payload.HitDistance < closestT)
+            if (_activeScene.Objects[i].Hit(ref ray, new Interval(0.001f, closestT), out var payload))
             {
                 closestT = payload.HitDistance;
-                hitObject = payload;
-                hitObject.ObjectIndex = i;
+                hitPayload = payload;
+                hit = true;
             }
         }
+        if (!hit) return RayMiss(ref ray);
 
-        if (closestT < float.MaxValue) //Hit!
-        {
-            var hitShape = _activeScene.Objects[hitObject.ObjectIndex];
-            var material = _activeScene.Materials[hitShape.MaterialIndex];
-            if (material.Scatter(ref ray, hitObject, out var color, out var newRay))
-                return color * PerPixel(ref newRay, depth - 1);
-            return Vector4.UnitW;
-        }
+        var material = _activeScene.Materials[hitPayload.MaterialIndex];
+        if (material.Scatter(ref ray, hitPayload, out var color, out var newRay))
+            return color * PerPixel(ref newRay, depth - 1);
+        return Vector4.UnitW;
 
+    }
+
+    public Vector4 RayMiss(ref Ray ray)
+    {
         var unitDirection = Vector3.Normalize(ray.Direction);
         var a = .5f * (unitDirection.Y + 1.0f);
         return new Vector4((1.0f - a) * Vector3.One + a * new Vector3(.5f, .7f, 1f), 1);

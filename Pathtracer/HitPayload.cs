@@ -7,7 +7,8 @@ public struct HitPayload
     public Vector3 HitPoint;
     public Vector3 HitNormal;
     public float HitDistance;
-    public int ObjectIndex;
+    public int MaterialIndex;
+    public Vector2 TextureCoordinate;
     public bool FrontFace;
 
     public void SetFaceNormal(ref Ray ray, ref Vector3 outwardNormal)

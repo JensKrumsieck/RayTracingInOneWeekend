@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Random = Catalyze.Random;
 
-namespace Pathtracer;
+namespace Pathtracer.Materials;
 
 public class Dielectric: Material
 {
@@ -15,10 +15,10 @@ public class Dielectric: Material
         var unitDir = Vector3.Normalize(rayIn.Direction);
         var cosTheta = MathF.Min(Vector3.Dot(-unitDir, payload.HitNormal), 1.0f);
         var sinTheta = MathF.Sqrt(1 - cosTheta * cosTheta);
-        var cannotRefract = refractRatio * sinTheta > 1.0f || Util.SchlickFresnel(cosTheta, refractRatio) > Random.Float(ref Pathtracer.Seed);
+        var cannotRefract = refractRatio * sinTheta > 1.0f || SchlickFresnel(cosTheta, refractRatio) > Random.Float(ref Pathtracer.Seed);
         var direction = cannotRefract ? 
-            Util.Reflect(unitDir, payload.HitNormal) : 
-            Util.Refract(unitDir, payload.HitNormal, refractRatio);
+            Reflect(unitDir, payload.HitNormal) : 
+            Refract(unitDir, payload.HitNormal, refractRatio);
         rayOut = new Ray(payload.HitPoint, direction);
         return true;
     }

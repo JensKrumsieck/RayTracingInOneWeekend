@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Random = Catalyze.Random;
 
-namespace Pathtracer;
+namespace Pathtracer.RenderObjects;
 
 public struct DepthOfFieldSettings
 {
