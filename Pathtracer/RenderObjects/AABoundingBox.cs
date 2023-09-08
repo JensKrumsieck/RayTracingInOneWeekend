@@ -37,7 +37,7 @@ public sealed class AABoundingBox
 
     public AABoundingBox Pad()
     {
-        var delta = .0001f;
+        var delta = .001f;
         var newX = (_x.Size >= delta) ? _x : _x.Expand(delta);
         var newY = (_y.Size >= delta) ? _y : _y.Expand(delta);
         var newZ = (_z.Size >= delta) ? _z : _z.Expand(delta);

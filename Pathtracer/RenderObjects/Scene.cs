@@ -10,6 +10,7 @@ public class Scene
     public readonly List<Hittable> Objects = new();
     public readonly List<Material> Materials = new();
     public AABoundingBox BBox = new();
+    public Texture Background = new SolidColorTexture(.1f, .1f, .1f);
     
     public Scene Compile()
     {
@@ -18,6 +19,7 @@ public class Scene
         scene.Objects.Add(new BVHNode(this));
         scene.Materials.AddRange(Materials);
         scene.BBox = BBox;
+        scene.Background = Background;
         return scene;
     }
 
@@ -33,6 +35,22 @@ public class Scene
         }
     }
 
+    public static Scene CornellBox()
+    {
+        var scene = new Scene();
+        scene.Materials.Add(new Lambertian(.65f, .05f, .05f));
+        scene.Materials.Add(new Lambertian(.73f, .73f, .73f));
+        scene.Materials.Add(new Lambertian(.12f, .45f, .15f));
+        scene.Materials.Add(new Emissive(1, 1, 1, 15));
+        scene.Objects.Add(new Quad{Position = new Vector3(555,0,0), U = new Vector3(0,555,0), V = new Vector3(0,0,555), MaterialIndex = 2});
+        scene.Objects.Add(new Quad{Position = new Vector3(0,0,0), U = new Vector3(0,555,0), V = new Vector3(0,0,555), MaterialIndex = 0});
+        scene.Objects.Add(new Quad{Position = new Vector3(343,554,332), U = new Vector3(-130,0,0), V = new Vector3(0,0,-105), MaterialIndex = 3});
+        scene.Objects.Add(new Quad{Position = new Vector3(0,0,0), U = new Vector3(555,0,0), V = new Vector3(0,0,555), MaterialIndex = 1});
+        scene.Objects.Add(new Quad{Position = new Vector3(555,555,555), U = new Vector3(-555,0,0), V = new Vector3(0,0,-555), MaterialIndex = 1});
+        scene.Objects.Add(new Quad{Position = new Vector3(0,0,555), U = new Vector3(555,0,0), V = new Vector3(0,555,0), MaterialIndex = 1});
+        return scene;
+    }
+    
     public static Scene Quads()
     {
         var scene = new Scene();

@@ -16,7 +16,7 @@ public class BVHNode : Hittable
     public BVHNode(IReadOnlyList<Hittable> hittables, int start, int end)
     {
         var hitObjects = hittables.ToArray();
-        var axis = (int) Random.Float(ref Pathtracer.Seed, 0, 2 + 1);
+        var axis = (int) Random.Float(ref Pathtracer.Seed, 0, 2);
         IComparer<Hittable> comparator = axis switch
         {
             0 => BoxComparatorX,

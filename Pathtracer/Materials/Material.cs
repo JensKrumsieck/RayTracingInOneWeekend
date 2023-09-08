@@ -6,7 +6,7 @@ namespace Pathtracer.Materials;
 public abstract class Material
 {
     public abstract bool Scatter(ref Ray rayIn, HitPayload payload, out Vector4 attenuation, out Ray rayOut);
-    
+    public virtual Vector4 Emit(float u, float v, Vector3 at) => Vector4.Zero;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Reflect(Vector3 v, Vector3 n) => v - 2 * Vector3.Dot(v, n) * n;

@@ -20,7 +20,7 @@ public class Camera
     public Vector3 LookAt = Vector3.Zero;
     public Vector3 Up = Vector3.UnitY;
     public float VerticalFovDegrees = 90f;
-    public DepthOfFieldSettings DepthOfFieldSettings;
+    public DepthOfFieldSettings DepthOfFieldSettings = new(0, 10);
     
     private uint _viewportWidth;
     private uint _viewportHeight;

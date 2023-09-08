@@ -77,19 +77,24 @@ public sealed unsafe class Pathtracer : IDisposable
             }
         }
         if (!hit) return RayMiss(ref ray);
-
+        
         var material = _activeScene.Materials[hitPayload.MaterialIndex];
-        if (material.Scatter(ref ray, hitPayload, out var color, out var newRay))
-            return color * PerPixel(ref newRay, depth - 1);
-        return Vector4.UnitW;
+        var emissionColor = material.Emit(hitPayload.TextureCoordinate.X, hitPayload.TextureCoordinate.Y, hitPayload.HitPoint);
+        if (!material.Scatter(ref ray, hitPayload, out var color, out var newRay))
+            return emissionColor;
+        var scatterColor = color * PerPixel(ref newRay, depth - 1);
+        return emissionColor + scatterColor;
 
     }
 
-    public Vector4 RayMiss(ref Ray ray)
+    private Vector4 RayMiss(ref Ray ray)
     {
-        var unitDirection = Vector3.Normalize(ray.Direction);
-        var a = .5f * (unitDirection.Y + 1.0f);
-        return new Vector4((1.0f - a) * Vector3.One + a * new Vector3(.5f, .7f, 1f), 1);
+        var dir = Vector3.Normalize(ray.Direction);
+        var u = 1 + MathF.Atan2(dir.X, -dir.Z) / MathF.PI;
+        var v = MathF.Acos(dir.Y) / MathF.PI;
+        var x = u / 2;
+        var y = v;
+        return new Vector4(_activeScene!.Background.Value(x, y, ray.Direction), 1);
     }
 
     public bool OnResize(uint width, uint height)
