@@ -8,7 +8,11 @@ The Pathtracer is currently using the CPU to render as done in the books althoug
 [Branch for finished Book 1](https://github.com/JensKrumsieck/RayTracingInOneWeekend/tree/Book-1)
 
 #### Ray Tracing: The next Week
+[Branch for finished Book 2](https://github.com/JensKrumsieck/RayTracingInOneWeekend/tree/Book-2)
+
+#### Ray Tracing: The Rest of Your Life
 Is currently being built in the master-branch
 
 #### Screenshots & Rendered Images
 ![Screenshot Book Cover 1](.github/cover_book1.png)
+![Screenshot Book Cover 2](.github/cover_book2.png)
