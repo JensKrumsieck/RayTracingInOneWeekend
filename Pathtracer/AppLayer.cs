@@ -14,14 +14,19 @@ public class AppLayer : IAppLayer
     private uint _viewportHeight;
     private bool _stop;
 
-    private readonly Scene _scene = Scene.CornellBox();
+    private readonly Scene _scene = Scene.Book2Cover();
 
     private Camera _camera = new()
     {
         VerticalFovDegrees = 40,
-        Position = new Vector3(278, 278, -800),
+        Position = new Vector3(478, 278, -600),
         LookAt = new Vector3(278, 278, 0)
     };
+    // {
+    //     VerticalFovDegrees = 40,
+    //     Position = new Vector3(278, 278, -800),
+    //     LookAt = new Vector3(278, 278, 0)
+    // };
     // {
     //     VerticalFovDegrees = 80,
     //     Position = new Vector3(0, 0,9),
@@ -61,7 +66,7 @@ public class AppLayer : IAppLayer
         ImGui.Text($"Frames: {_pathtracer.FrameIndex}");
         ImGui.Separator();
         ImGui.SetNextItemWidth(50);
-        ImGui.DragInt("Time Limit", ref _pathtracer.Settings.TimeLimit, 1, 0, 1000);
+        ImGui.DragInt("Time Limit", ref _pathtracer.Settings.TimeLimit, 1, 0, 10000);
         ImGui.Text($"Renderer is {(!_stop? "active" :  "idle")}");
         if (_stop) if (ImGui.Button("Restart Renderer")) Reset();
         ImGui.Separator();

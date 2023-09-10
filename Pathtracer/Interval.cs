@@ -17,6 +17,8 @@ public readonly struct Interval
         Max = float.NegativeInfinity; 
     }
 
+    public static Interval Full => new(0.0001f, float.MaxValue);
+
     public Interval(Interval a, Interval b)
     {
         Min = MathF.Min(a.Min, b.Min);

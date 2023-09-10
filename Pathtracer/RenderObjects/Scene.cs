@@ -46,6 +46,8 @@ public class Scene : HittableList
         scene.Materials.Add(new Lambertian(.73f, .73f, .73f));
         scene.Materials.Add(new Lambertian(.12f, .45f, .15f));
         scene.Materials.Add(new Emissive(1, 1, 1, 15));
+        scene.Materials.Add(new Isotropic(0,0,0));
+        scene.Materials.Add(new Isotropic(1,1,1));
         
         scene.Objects.Add(new Quad(new Vector3(555,0,0), new Vector3(0,555,0),  new Vector3(0,0,555),  2));
         scene.Objects.Add(new Quad(new Vector3(0,0,0), new Vector3(0,555,0),  new Vector3(0,0,555),  0));
@@ -66,25 +68,6 @@ public class Scene : HittableList
         
         return scene;
     }
-    
-    public static Scene Quads()
-    {
-        var scene = new Scene();
-        scene.Materials.Add(new Lambertian(1f,.2f,.2f));
-        scene.Materials.Add(new Lambertian(.2f,1f,.2f));
-        scene.Materials.Add(new Lambertian(.2f,.2f,1f));
-        scene.Materials.Add(new Lambertian(1f,.5f,.0f));
-        scene.Materials.Add(new Lambertian(.2f,.8f,.8f));
-        
-        scene.Objects.Add(new Quad(new Vector3(-3,-2,5),  new Vector3(0,0,-4),  new Vector3(0,4,0),  0));
-        scene.Objects.Add(new Quad(new Vector3(-2,-2,0),  new Vector3(4,0,0),  new Vector3(0,4,0),  1));
-        scene.Objects.Add(new Quad(new Vector3(3,-2,1),  new Vector3(0,0,4),  new Vector3(0,4,0),  2));
-        scene.Objects.Add(new Quad(new Vector3(-2,3,1),  new Vector3(4,0,0),  new Vector3(0,0,4),  3));
-        scene.Objects.Add(new Quad(new Vector3(-2,-3,5),  new Vector3(4,0,0),  new Vector3(0,0,-4),  4));
-        return scene;
-    }
-    
-    
     public static Scene Earth()
     {
         var scene = new Scene();
@@ -139,6 +122,61 @@ public class Scene : HittableList
             }
         }
 
+        return scene;
+    }
+
+    public static Scene Book2Cover()
+    {
+        var scene = new Scene();
+        scene.Background = new SolidColorTexture(0, 0, 0);
+        var earthTex = new ImageTexture(@".\assets\textures\earthmap.jpg");
+        var noiseTex = new NoiseTexture(.1f, 1, 7, true);
+        
+        scene.Materials.Add(new Lambertian(.48f, .83f, .53f));
+        scene.Materials.Add(new Emissive(1, 1, 1, 7));
+        scene.Materials.Add(new Lambertian(.7f, .3f, .1f));
+        scene.Materials.Add(new Dielectric(){IoR = 1.5f});
+        scene.Materials.Add(new Metal{Albedo = new Vector3(.8f, .8f, .9f), Roughness = 1.0f});
+        scene.Materials.Add(new Isotropic(.2f, .4f, .9f));
+        scene.Materials.Add(new Isotropic(1,1,1));
+        scene.Materials.Add(new Lambertian(earthTex));
+        scene.Materials.Add(new Lambertian(noiseTex));
+        scene.Materials.Add(new Lambertian(.73f, .73f, .73f));
+        
+        const int numBoxes = 20;
+        var boxes = new HittableList();
+        for (var i = 0; i < numBoxes; i++)
+        {
+            for (var j = 0; j < numBoxes; j++)
+            {
+                var w = 100.0f;
+                var x0 = -1000.0f + i * w;
+                var z0 = -1000.0f + j * w;
+                var y0 = 0.0f;
+                var x1 = x0 + w;
+                var y1 = Random.Float(ref Pathtracer.Seed, 1, 101);
+                var z1 = z0 + w;
+                boxes.Add(MakeBox(new Vector3(x0, y0, z0), new Vector3(x1, y1, z1), 0));
+            }
+        }
+        scene.Add(boxes);
+        scene.Add(new Quad(new Vector3(123, 554, 147), new Vector3(300, 0, 0), new Vector3(0, 0, 265), 1));
+        var center1 = new Vector3(400, 400, 200);
+        //var center2 = center1 + new Vector3(30, 0, 0); //not used as moving objects is not implemented
+        scene.Add(new Sphere(center1, 50, 2));
+        scene.Add(new Sphere(new Vector3(260, 150, 45), 50, 3));
+        scene.Add(new Sphere(new Vector3(0, 150, 145), 50, 4));
+        var boundary = new Sphere(new Vector3(360, 150, 145), 70, 3);
+        scene.Add(boundary);
+        scene.Add(new ConstantMedium(boundary, .2f, 5));
+        boundary = new Sphere(new Vector3(0, 0, 0), 5000, 3);
+        scene.Add(new ConstantMedium(boundary, .0001f, 6));
+        scene.Add(new Sphere(new Vector3(400,200,400), 100, 7));
+        scene.Add(new Sphere(new Vector3(220, 280, 300), 80, 8));
+        var ns = 1000;
+        var boxes2 = new HittableList();
+        for (var i = 0; i < ns; i++) boxes2.Add(new Sphere(Random.Vec3(ref Pathtracer.Seed, 0, 165), 10, 9));
+        scene.Add(new Translation(new RotationY(new BVHNode(boxes2), 15), new Vector3(-100, 270, 395)));
         return scene;
     }
 }

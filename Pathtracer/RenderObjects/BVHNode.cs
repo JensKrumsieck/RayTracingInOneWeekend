@@ -11,8 +11,7 @@ public class BVHNode : Hittable
     private readonly Hittable _left;
     private readonly Hittable _right;
 
-    public BVHNode(Scene scene) : this(scene.Objects, 0, scene.Objects.Count){}
-
+    public BVHNode(HittableList hittables) : this(hittables.Objects, 0, hittables.Objects.Count){}
     public BVHNode(IReadOnlyList<Hittable> hittables, int start, int end)
     {
         var hitObjects = hittables.ToArray();

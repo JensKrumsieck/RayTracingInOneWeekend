@@ -63,7 +63,7 @@ public sealed unsafe class Pathtracer : IDisposable
     {
         if (depth <= 0) return Vector4.Zero;
         
-        var hit = _activeScene!.Hit(ref ray, new Interval(0.0001f, float.MaxValue), out var hitPayload);
+        var hit = _activeScene!.Hit(ref ray, Interval.Full, out var hitPayload);
         if (!hit) return RayMiss(ref ray);
         
         var material = _activeScene.Materials[hitPayload.MaterialIndex];
