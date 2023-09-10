@@ -8,6 +8,10 @@ public sealed class AABoundingBox
     private readonly Interval _y;
     private readonly Interval _z;
 
+    public Interval X => _x;
+    public Interval Y => _y;
+    public Interval Z => _z;
+    
     public AABoundingBox()
     {
         _x = new Interval();
@@ -70,4 +74,8 @@ public sealed class AABoundingBox
         }
         return true;
     }
+
+    public static AABoundingBox operator +(AABoundingBox aabb, Vector3 offset) =>
+        new(aabb._x + offset.X, aabb._y + offset.Y, aabb._z + offset.Z);
+    public static AABoundingBox operator +(Vector3 offset, AABoundingBox aabb) => aabb + offset;
 }

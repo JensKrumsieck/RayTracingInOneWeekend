@@ -37,4 +37,6 @@ public readonly struct Interval
         var padding = delta / 2;
         return new Interval(Min - padding, Max + padding);
     }
+    public static Interval operator +(Interval i, float offset) => new(i.Min + offset, i.Max + offset);
+    public static Interval operator +(float offset, Interval i) => i + offset;
 }

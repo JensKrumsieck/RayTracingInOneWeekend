@@ -62,20 +62,8 @@ public sealed unsafe class Pathtracer : IDisposable
     private Vector4 PerPixel(ref Ray ray, int depth)
     {
         if (depth <= 0) return Vector4.Zero;
-        if (!_activeScene!.BBox.Hit(ref ray, new Interval(0.001f, float.MaxValue))) return RayMiss(ref ray);
         
-        var closestT = float.MaxValue;
-        var hit = false;
-        var hitPayload = HitPayload.NoHit;
-        for (var i = 0; i < _activeScene!.Objects.Count; i++)
-        {
-            if (_activeScene.Objects[i].Hit(ref ray, new Interval(0.001f, closestT), out var payload))
-            {
-                closestT = payload.HitDistance;
-                hitPayload = payload;
-                hit = true;
-            }
-        }
+        var hit = _activeScene!.Hit(ref ray, new Interval(0.0001f, float.MaxValue), out var hitPayload);
         if (!hit) return RayMiss(ref ray);
         
         var material = _activeScene.Materials[hitPayload.MaterialIndex];

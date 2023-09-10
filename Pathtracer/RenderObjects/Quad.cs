@@ -7,6 +7,15 @@ public class Quad : Shape
     public Vector3 U;
     public Vector3 V;
 
+    public Quad(Vector3 position, Vector3 u, Vector3 v, int materialIndex)
+    {
+        MaterialIndex = materialIndex;
+        Position = position;
+        U = u;
+        V = v;
+        BoundingBox = new AABoundingBox(Position, Position + U + V).Pad();
+    }
+
     public override bool Hit(ref Ray ray, Interval t, out HitPayload payload)
     {
         payload = HitPayload.NoHit;
@@ -44,10 +53,4 @@ public class Quad : Shape
         payload.TextureCoordinate = new Vector2(a, b);
         return true;
     }
-    
-    public override void CalculateBoundingBox()
-    {
-        BoundingBox = new AABoundingBox(Position, Position + U + V).Pad();
-    }
-    public override Vector2 TextureCoordinates(Vector3 at) => throw new NotImplementedException();
 }
