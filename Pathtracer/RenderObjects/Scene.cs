@@ -80,6 +80,7 @@ public class Scene : HittableList
     public static Scene Book1Cover()
     {
         var scene = new Scene();
+        scene.Background = new SolidColorTexture(1, 1, 1);
         //textures
         var checker = new CheckerTexture(0.32f, new Vector3(.2f, .3f, .1f), new Vector3(.9f, .9f, .9f));
         //main elements

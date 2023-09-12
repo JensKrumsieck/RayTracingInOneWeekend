@@ -50,8 +50,9 @@ public sealed unsafe class Pathtracer : IDisposable
                 }
             }
             
-            _accumulationData[x + _y * _texture.Width] += sampledColor;
-            var color = _accumulationData[x + _y * _texture.Width] / (_frameIndex * _activeCamera.SamplesPerPixel);
+            _accumulationData[x + _y * _texture.Width] += sampledColor / _activeCamera.SamplesPerPixel;
+            var color = _accumulationData[x + _y * _texture.Width] / _frameIndex;
+            
             color = Util.LinearToGamma(color);
             color = Vector4.Clamp(color, Vector4.Zero, Vector4.One);
             _imageData[x + _y * _texture.Width] = Util.ToAbgr(color);
