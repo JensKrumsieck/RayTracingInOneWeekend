@@ -21,7 +21,10 @@ public class Camera
     public Vector3 Up = Vector3.UnitY;
     public float VerticalFovDegrees = 90f;
     public DepthOfFieldSettings DepthOfFieldSettings = new(0, 10);
-    
+    public int SamplesPerPixel = 64;
+    public int SqrtSamplesPerPixel => (int)MathF.Sqrt(SamplesPerPixel);
+    private float _reciprocalSqrtSamplesPerPixel => 1f / SqrtSamplesPerPixel;
+
     private uint _viewportWidth;
     private uint _viewportHeight;
 
@@ -30,6 +33,7 @@ public class Camera
     private Vector3 _deltaV;
     private Vector3 _defocusDiskU;
     private Vector3 _defocusDiskV;
+    
     public void OnResize(uint width, uint height)
     {
         if(_viewportWidth == width && _viewportHeight == height) return;
@@ -61,9 +65,9 @@ public class Camera
         _defocusDiskV = v * defocusRadius;
     }
 
-    public Ray GetDirection(int x, int y)
+    public Ray GetRay(int x, int y, int sx, int sy)
     {
-       var pixelSample = _centerPixel + (x * _deltaU) + (y * _deltaV) + RandomSquare();
+       var pixelSample = _centerPixel + (x * _deltaU) + (y * _deltaV) + RandomSquare(sx, sy);
        var origin = DepthOfFieldSettings.DefocusAngle <= 0 ? Position : DefocusDiskSample();
        return new Ray(origin, pixelSample - origin);
     }
@@ -75,10 +79,10 @@ public class Camera
         return Position + (p.X * _defocusDiskU) + (p.Y * _defocusDiskV);
     }
 
-    private Vector3 RandomSquare()
+    private Vector3 RandomSquare(int sx, int sy)
     {
-        var px = -.5f + Random.Float(ref Pathtracer.Seed);
-        var py = -.5f + Random.Float(ref Pathtracer.Seed);
+        var px = -.5f + _reciprocalSqrtSamplesPerPixel * (sx + Random.Float(ref Pathtracer.Seed));
+        var py = -.5f + _reciprocalSqrtSamplesPerPixel * (sy + Random.Float(ref Pathtracer.Seed));
         return (px * _deltaU) + (py * _deltaV);
     }
 

@@ -27,6 +27,7 @@ public sealed unsafe class Pathtracer : IDisposable
     private Scene? _activeScene;
     private Camera _activeCamera = null!;
     private int _frameIndex = 1;
+    private int _y;
 
     public void LoadScene(Scene scene) => _activeScene = scene.Compile();
 
@@ -35,29 +36,33 @@ public sealed unsafe class Pathtracer : IDisposable
         if(_texture is null || _imageData is null || _accumulationData is null) return;
         _activeCamera = camera;
         if(_frameIndex == 1) Array.Clear(_accumulationData);
-
-        Parallel.For(0, (int) _texture.Height, y =>
+        Parallel.For(0, (int) _texture.Width, x =>
         {
-            for (var x = 0; x < _texture.Width; ++x)
+            var sampledColor = Vector4.Zero;
+            
+            for (var sy = 0; sy < _activeCamera.SqrtSamplesPerPixel; sy++)
             {
-                Seed += (uint) ((x * y + _texture.Width) * _frameIndex);
-                var ray = _activeCamera.GetDirection(x, y);
-                _accumulationData[x + y * _texture.Width] += PerPixel(ref ray, 5);
-
-                var color = _accumulationData[x + y * _texture.Width] / _frameIndex;
-                color = Util.LinearToGamma(color);
-                color = Vector4.Clamp(color, Vector4.Zero, Vector4.One);
-                _imageData[x + y * _texture.Width] = Util.ToAbgr(color);
+                for (var sx = 0; sx < _activeCamera.SqrtSamplesPerPixel; sx++)
+                {
+                    Seed += (uint) ((x * _y + _texture.Width) * _frameIndex * (sx * sy)) * 156464987;
+                    var ray = _activeCamera.GetRay(x, _y, sx, sy);
+                    sampledColor += PerPixel(ref ray, 5);
+                }
             }
+            
+            _accumulationData[x + _y * _texture.Width] += sampledColor;
+            var color = _accumulationData[x + _y * _texture.Width] / (_frameIndex * _activeCamera.SamplesPerPixel);
+            color = Util.LinearToGamma(color);
+            color = Vector4.Clamp(color, Vector4.Zero, Vector4.One);
+            _imageData[x + _y * _texture.Width] = Util.ToAbgr(color);
         });
+        _y = (int) ((_y + 1) % _texture.Height);
+        if (_y == 0) _frameIndex++;
         
         fixed(uint* pImageData = _imageData)
             _texture.SetData(pImageData);
         
-        if(Settings.Accumulate)
-            _frameIndex++;
-        else
-            _frameIndex = 1;
+        
     }
     private Vector4 PerPixel(ref Ray ray, int depth)
     {
@@ -68,9 +73,9 @@ public sealed unsafe class Pathtracer : IDisposable
         
         var material = _activeScene.Materials[hitPayload.MaterialIndex];
         var emissionColor = material.Emit(hitPayload.TextureCoordinate.X, hitPayload.TextureCoordinate.Y, hitPayload.HitPoint);
-        if (!material.Scatter(ref ray, hitPayload, out var color, out var newRay))
+        if (!material.Scatter(ref ray, hitPayload, out var attenuation, out var newRay))
             return emissionColor;
-        var scatterColor = color * PerPixel(ref newRay, depth - 1);
+        var scatterColor = attenuation * PerPixel(ref newRay, depth - 1);
         return emissionColor + scatterColor;
 
     }
@@ -121,6 +126,7 @@ public sealed unsafe class Pathtracer : IDisposable
     {
         Dispose();
         _texture = null;
+        _y = 0;
     }
     
     public void Dispose() => _texture?.Dispose();

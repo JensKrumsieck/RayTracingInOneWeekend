@@ -14,19 +14,19 @@ public class AppLayer : IAppLayer
     private uint _viewportHeight;
     private bool _stop;
 
-    private readonly Scene _scene = Scene.Book2Cover();
+    private readonly Scene _scene = Scene.CornellBox();
 
     private Camera _camera = new()
-    {
-        VerticalFovDegrees = 40,
-        Position = new Vector3(478, 278, -600),
-        LookAt = new Vector3(278, 278, 0)
-    };
     // {
     //     VerticalFovDegrees = 40,
-    //     Position = new Vector3(278, 278, -800),
+    //     Position = new Vector3(478, 278, -600),
     //     LookAt = new Vector3(278, 278, 0)
     // };
+    {
+        VerticalFovDegrees = 40,
+        Position = new Vector3(278, 278, -800),
+        LookAt = new Vector3(278, 278, 0)
+    };
     // {
     //     VerticalFovDegrees = 80,
     //     Position = new Vector3(0, 0,9),
@@ -53,7 +53,6 @@ public class AppLayer : IAppLayer
     public void OnAttach()
     {
         PushStyle();
-        _pathtracer.Settings.TimeLimit = 50;
         _pathtracer.LoadScene(_scene);
     }
 
@@ -65,12 +64,6 @@ public class AppLayer : IAppLayer
         ImGui.Text($"Total Time: {_diagnoser.TotalRenderTime / 1000:N3}s");
         ImGui.Text($"Frames: {_pathtracer.FrameIndex}");
         ImGui.Separator();
-        ImGui.SetNextItemWidth(50);
-        ImGui.DragInt("Time Limit", ref _pathtracer.Settings.TimeLimit, 1, 0, 10000);
-        ImGui.Text($"Renderer is {(!_stop? "active" :  "idle")}");
-        if (_stop) if (ImGui.Button("Restart Renderer")) Reset();
-        ImGui.Separator();
-        ImGui.Checkbox("Accumulate Samples", ref _pathtracer.Settings.Accumulate);
         if(ImGui.Button("Save Image")) _pathtracer.SaveImageToDisk();
         ImGui.End();
 
@@ -86,9 +79,6 @@ public class AppLayer : IAppLayer
     }
     public void OnUpdate(double deltaTime)
     {
-        if (_stop) return;
-        _stop = _pathtracer.Settings.TimeLimit > 0 && _diagnoser.TotalRenderTime / 1000 > _pathtracer.Settings.TimeLimit;
-
         _diagnoser.BeginFrame();
         
         _camera.OnResize(_viewportWidth, _viewportHeight);
@@ -96,13 +86,6 @@ public class AppLayer : IAppLayer
         _pathtracer.OnRender(_camera);
         
         _diagnoser.EndFrame();
-    }
-
-    private void Reset()
-    {
-        _stop = false;
-        _diagnoser.Reset();
-        _pathtracer.Reset();
     }
     
     public void OnDetach()
