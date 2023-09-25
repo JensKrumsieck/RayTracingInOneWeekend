@@ -16,3 +16,6 @@ Is currently being built in the master-branch
 #### Screenshots & Rendered Images
 ![Screenshot Book Cover 1](.github/cover_book1.png)
 ![Screenshot Book Cover 2](.github/cover_book2.png)
+
+### GPU Version?
+[Compute Shader Raytracing](https://github.com/JensKrumsieck/raytracing-vulkan)
