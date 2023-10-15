@@ -62,11 +62,8 @@ public sealed unsafe class Pathtracer : IDisposable
         });
         _y = (int) ((_y + 1) % _texture.Height);
         if (_y == 0) _frameIndex++;
-        
         fixed(uint* pImageData = _imageData)
             _texture.SetData(pImageData);
-        
-        
     }
     private Vector4 PerPixel(ref Ray ray, int depth)
     {
@@ -81,7 +78,6 @@ public sealed unsafe class Pathtracer : IDisposable
             return emissionColor;
         var scatterColor = attenuation * PerPixel(ref newRay, depth - 1);
         return emissionColor + scatterColor;
-
     }
 
     private Vector4 RayMiss(ref Ray ray)
@@ -105,7 +101,7 @@ public sealed unsafe class Pathtracer : IDisposable
         }
         else
             _texture = new VkImage(_device, width, height, Format.R8G8B8A8Srgb, ImageLayout.ShaderReadOnlyOptimal);
-        
+
         if(_texture.ImGuiDescriptorSet.Handle != 0) _uiContext.RemoveTexture(_texture);
         _uiContext.AddTexture(_texture);
 
@@ -124,13 +120,6 @@ public sealed unsafe class Pathtracer : IDisposable
             bitmap.InstallPixels(info, (nint)pImageData, info.RowBytes);
         using var fs = File.Create("./render.png");
         bitmap.Encode(fs, SKEncodedImageFormat.Png, 100);
-    }
-
-    public void Reset()
-    {
-        Dispose();
-        _texture = null;
-        _y = 0;
     }
     
     public void Dispose() => _texture?.Dispose();

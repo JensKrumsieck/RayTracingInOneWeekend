@@ -76,7 +76,7 @@ public class PathtracingApplication : ImGuiApplication
         ImGui.Begin("Viewport");
         _viewportWidth = (uint)ImGui.GetContentRegionAvail().X;
         _viewportHeight = (uint)ImGui.GetContentRegionAvail().Y;
-        if (_pathtracer.FinalImage is not null)
+        if (_pathtracer.FinalImage is not null && _pathtracer.FinalImage.ImGuiDescriptorSet.Handle != 0)
             ImGui.Image((nint) _pathtracer.FinalImage.ImGuiDescriptorSet.Handle,
                 new Vector2(_viewportWidth, _viewportHeight));
         ImGui.End();

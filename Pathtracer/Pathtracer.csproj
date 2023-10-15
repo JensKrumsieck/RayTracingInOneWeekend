@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Licht" Version="0.1.0-CI-20231015-191306" />
-        <PackageReference Include="Licht.Vulkan" Version="0.1.0-CI-20231015-191306" />
+        <PackageReference Include="Licht" Version="0.1.0-CI-20231015-201449" />
+        <PackageReference Include="Licht.Vulkan" Version="0.1.0-CI-20231015-201449" />
     </ItemGroup>
     <ItemGroup>
         <None Include="assets/**/*">
