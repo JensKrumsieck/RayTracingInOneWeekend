@@ -1,25 +1,19 @@
 ﻿using System.Numerics;
-using Catalyze;
-using Catalyze.Applications;
-using Catalyze.UI;
+using Licht.Vulkan;
+using Licht.Vulkan.UI;
 using Pathtracer.RenderObjects;
 using Silk.NET.Vulkan;
 using SkiaSharp;
-using Renderer = Catalyze.Renderer;
-using Texture = Catalyze.Texture;
 
 namespace Pathtracer;
 
 public sealed unsafe class Pathtracer : IDisposable
 {
-    private readonly GraphicsDevice _device = Application.GetInstance().GetModule<Renderer>()!.Device;
-    private readonly ImGuiRenderer _guiRenderer = Application.GetInstance().GetModule<ImGuiRenderer>()!;
-
     public Settings Settings = new();
-    public Texture? FinalImage => _texture;
+    public VkImage? FinalImage => _texture;
     public int FrameIndex => _frameIndex;
     
-    private Texture? _texture;
+    private VkImage? _texture;
     private uint[]? _imageData;
     public static uint Seed;
     private Vector4[]? _accumulationData;
@@ -29,6 +23,15 @@ public sealed unsafe class Pathtracer : IDisposable
     private int _frameIndex = 1;
     private int _y;
 
+    private readonly VkGraphicsDevice _device;
+    private readonly ImGuiContext _uiContext;
+
+    public Pathtracer(VkGraphicsDevice device, ImGuiContext ctx)
+    {
+        _device = device;
+        _uiContext = ctx;
+    }
+    
     public void LoadScene(Scene scene) => _activeScene = scene.Compile();
 
     public void OnRender(Camera camera)
@@ -101,10 +104,10 @@ public sealed unsafe class Pathtracer : IDisposable
             _texture.Resize(width, height);
         }
         else
-            _texture = new Texture(_device, width, height, Format.R8G8B8A8Srgb, ImageLayout.ShaderReadOnlyOptimal);
+            _texture = new VkImage(_device, width, height, Format.R8G8B8A8Srgb, ImageLayout.ShaderReadOnlyOptimal);
         
-        _guiRenderer.UnloadTexture(_texture);
-        _guiRenderer.LoadTexture(_texture);
+        if(_texture.ImGuiDescriptorSet.Handle != 0) _uiContext.RemoveTexture(_texture);
+        _uiContext.AddTexture(_texture);
 
         _imageData = new uint[width * height];
         _accumulationData = new Vector4[width * height];

@@ -1,6 +1,4 @@
 ﻿using System.Numerics;
-using Random = Catalyze.Random;
-
 namespace Pathtracer.Materials;
 
 public class Metal : Material

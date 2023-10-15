@@ -2,7 +2,7 @@
 
 This repository contains a Pathtracer, created by following the the Ray Tracing in One Weekend book series available at https://raytracing.github.io/ 
 
-The Pathtracer is currently using the CPU to render as done in the books although the GUI is using Vulkan and ImGUI using [Catalyze](https://github.com/JensKrumsieck/Catalyze).
+The Pathtracer is currently using the CPU to render as done in the books although the GUI is using Vulkan and ImGUI using [Licht](https://github.com/JensKrumsieck/Licht).
 
 #### Ray Tracing in One Weekend
 [Branch for finished Book 1](https://github.com/JensKrumsieck/RayTracingInOneWeekend/tree/Book-1)

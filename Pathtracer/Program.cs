@@ -1,26 +1,18 @@
-﻿using Catalyze;
-using Catalyze.Allocation;
-using Catalyze.Applications;
+﻿using Licht.Applications;
+using Licht.Core;
+using Licht.Vulkan.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Pathtracer;
-using Silk.NET.Input.Glfw;
-using Silk.NET.Windowing;
-using Silk.NET.Windowing.Glfw;
 
-GlfwWindowing.RegisterPlatform();
-GlfwInput.RegisterPlatform();
-GlfwWindowing.Use();
+var opts = ApplicationSpecification.Default with {ApplicationName = "Triangle"};
+var builder = new ApplicationBuilder(opts);
 
-var builder = Application.CreateBuilder();
-var window = builder.Services.AddWindowing(WindowOptions.DefaultVulkan);
-builder.Services.AddInput(window);
-builder.Services.RegisterSingleton<IAllocator, PassthroughAllocator>();
+builder.Services.AddSingleton<ILogger, Logger>();
+builder.Services.AddWindow(opts);
+builder.Services.AddVulkanRenderer<PassthroughAllocator>();
 
-var app = builder.Build();
-
-var options = new GraphicsDeviceCreateOptions();
-
-app.UseVulkan(options)
-    .UseImGui()
-    .AttachLayer<AppLayer>();
-app.Run();
-app.Dispose();
+{
+    using var app = builder.Build<PathtracingApplication>();
+    app.Run();
+}

@@ -1,6 +1,5 @@
 ﻿using System.Buffers;
 using System.Numerics;
-using Random = Catalyze.Random;
 
 namespace Pathtracer;
 

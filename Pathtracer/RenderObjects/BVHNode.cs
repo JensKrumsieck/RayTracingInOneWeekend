@@ -1,6 +1,4 @@
-﻿using Random = Catalyze.Random;
-
-namespace Pathtracer.RenderObjects;
+﻿namespace Pathtracer.RenderObjects;
 
 public class BVHNode : Hittable
 {

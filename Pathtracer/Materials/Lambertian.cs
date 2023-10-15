@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using Pathtracer.Materials.Textures;
-using Random = Catalyze.Random;
 
 namespace Pathtracer.Materials;
 

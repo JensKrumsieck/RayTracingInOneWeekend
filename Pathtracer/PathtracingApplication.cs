@@ -1,14 +1,18 @@
 ﻿using System.Numerics;
-using Catalyze.Applications;
 using ImGuiNET;
+using Licht.Applications;
+using Licht.Vulkan;
+using Microsoft.Extensions.Logging;
 using Pathtracer.RenderObjects;
+using Silk.NET.Windowing;
 
 namespace Pathtracer;
 
-public class AppLayer : IAppLayer
+public class PathtracingApplication : ImGuiApplication
 {
+    
     private readonly Diagnoser _diagnoser = new();
-    private readonly Pathtracer _pathtracer = new();
+    private readonly Pathtracer _pathtracer;
     
     private uint _viewportWidth;
     private uint _viewportHeight;
@@ -41,6 +45,12 @@ public class AppLayer : IAppLayer
     //     DepthOfFieldSettings = new DepthOfFieldSettings(0.6f, 10.0f)
     // };
 
+    public PathtracingApplication(ILogger logger, VkRenderer renderer, IWindow window) : base(logger, renderer, window)
+    {
+        _pathtracer = new Pathtracer(renderer.Device, UiContext);
+        PushStyle();
+        _pathtracer.LoadScene(_scene);
+    }
     private void PushStyle()
     {
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(6,6));
@@ -50,14 +60,9 @@ public class AppLayer : IAppLayer
         ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 
-    public void OnAttach()
+    public override void DrawUI(CommandBuffer cmd, float deltaTime)
     {
-        PushStyle();
-        _pathtracer.LoadScene(_scene);
-    }
-
-    public void OnDrawGui(double deltaTime)
-    {
+        base.DrawUI(cmd, deltaTime);
         ImGui.DockSpaceOverViewport();
         ImGui.Begin("Information");
         ImGui.Text($"Last Render: {_diagnoser.LastRenderTime:N3} ms");
@@ -72,13 +77,15 @@ public class AppLayer : IAppLayer
         _viewportWidth = (uint)ImGui.GetContentRegionAvail().X;
         _viewportHeight = (uint)ImGui.GetContentRegionAvail().Y;
         if (_pathtracer.FinalImage is not null)
-            ImGui.Image((nint) _pathtracer.FinalImage.DescriptorSet.Handle,
+            ImGui.Image((nint) _pathtracer.FinalImage.ImGuiDescriptorSet.Handle,
                 new Vector2(_viewportWidth, _viewportHeight));
         ImGui.End();
         ImGui.PopStyleVar();
     }
-    public void OnUpdate(double deltaTime)
+
+    public override void Update(float deltaTime)
     {
+        base.Update(deltaTime);
         _diagnoser.BeginFrame();
         
         _camera.OnResize(_viewportWidth, _viewportHeight);
@@ -87,9 +94,10 @@ public class AppLayer : IAppLayer
         
         _diagnoser.EndFrame();
     }
-    
-    public void OnDetach()
+
+    public override void Release()
     {
+        base.Release();
         _diagnoser.Reset();
         _pathtracer.Dispose();
     }
